@@ -21,6 +21,7 @@ import javax.swing.Timer;
 
 import org.zhouer.utils.Convertor;
 import org.zhouer.utils.TextUtils;
+import org.zhouer.zterm.Session;
 
 class FIFOSet
 {
@@ -130,6 +131,9 @@ public class VT100 extends JComponent
 	private int ccol, crow;
 	private int lcol, lrow;
 	private int scol, srow;
+	
+	// the last line write to log file
+	private int logLastLine;
 	
 	// 儲存螢幕上的相關資訊
 	private char[][] text;			// 轉碼後的 char
@@ -1920,6 +1924,7 @@ public class VT100 extends JComponent
 		// case 11:
 		// case 12:
 		case 13: // CR (Carriage Return)
+			writeLogLine();
 			ccol = leftmargin;
 			break;
 		case 14: // SO (Shift Out)
@@ -1990,6 +1995,7 @@ public class VT100 extends JComponent
 		// 紀錄 char 後要把對應的屬性及色彩等資料從 buffer 複製過來，並設定重繪。
 		prow = physicalRow( crow );
 		text[prow][ccol - 1] = c;
+		//System.out.println("crow="+crow+", prow="+prow+" ,ccol="+ccol + ", "+c);
 		
 		// 到這裡我們才知道字元真正被放到陣列中的位置，所以現在才紀錄 url 的位置
 		if( addurl ) {
@@ -2070,6 +2076,23 @@ public class VT100 extends JComponent
 			// 只要游標有移動過，就一定不是 linefull
 			linefull = false;
 		}
+	}
+	
+	private void writeLogLine() {
+		Session currentSession = (Session)parent;
+		if(!currentSession.isLogging()) return; // not at log mode
+		
+		int prow = physicalRow( crow );
+		if (prow==logLastLine) return; // prevent double carriage return at same line 
+		
+		logLastLine = prow;
+		for(int i=0; i<ccol-1; ++i){
+			//System.out.print(text[prow][i]);
+			currentSession.writeLog(text[prow][i]);
+			if (Convertor.isWideChar( text[prow][i] )) // encounter wide char
+				++i; // skip next char because it's a redundant space
+		}
+		currentSession.writeLog('\n');
 	}
 	
 	private void draw()
@@ -2281,6 +2304,8 @@ public class VT100 extends JComponent
 		resource = c;
 		conv = cv;
 		bi = b;
+		
+		logLastLine = -1;
 		
 		// 初始化一些變數、陣列
 		initValue();

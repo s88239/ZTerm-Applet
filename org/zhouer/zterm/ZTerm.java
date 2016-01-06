@@ -1,6 +1,7 @@
 package org.zhouer.zterm;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.DefaultKeyboardFocusManager;
 import java.awt.Font;
 import java.awt.KeyEventDispatcher;
@@ -18,6 +19,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Vector;
@@ -26,6 +29,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -61,13 +65,15 @@ public class ZTerm extends JPanel implements ActionListener, ChangeListener, Key
 	
 	// 連線工具列
 	private JToolBar connectionToolbar;
-	private JButton openButton, closeButton, reopenButton;
+	private JButton closeButton, reopenButton, logButton;
 	//private JButton copyButton, colorCopyButton, pasteButton, colorPasteButton;
 	//private JButton telnetButton, sshButton;
 	
 	private DefaultComboBoxModel siteModel;
 	private JComboBox siteField;
 	private JTextComponent siteText;
+	
+	private final JFileChooser fileChooser;
 	
 	// 分頁
 	private JTabbedPane tabbedPane;
@@ -201,9 +207,12 @@ public class ZTerm extends JPanel implements ActionListener, ChangeListener, Key
 		siteText = (JTextComponent)siteField.getEditor().getEditorComponent();
 		siteText.addKeyListener( this );
 		
-		openButton = new JButton( Messages.getString("ZTerm.Open_Button_Text") ); //$NON-NLS-1$
-		openButton.setFocusable( false );
-		openButton.addActionListener( this );
+		logButton = new JButton( Messages.getString("ZTerm.Log_Button_Text") );
+		logButton.setFocusable( false );
+		logButton.addActionListener( this );
+		// set the color of logButton to pink to represent log function is disable now 
+		logButton.setBackground(Color.PINK);
+		logButton.setOpaque(true);
 		
 		connectionToolbar.add(closeButton);
 		connectionToolbar.add(reopenButton);
@@ -226,7 +235,7 @@ public class ZTerm extends JPanel implements ActionListener, ChangeListener, Key
 		
 		connectionToolbar.add( new JToolBar.Separator() );
 		
-		connectionToolbar.add( openButton );
+		connectionToolbar.add( logButton );
 		
 		this.add( connectionToolbar, BorderLayout.NORTH );
 	}
@@ -311,22 +320,33 @@ public class ZTerm extends JPanel implements ActionListener, ChangeListener, Key
 		}
 	}
 	
+	public void updateLogButton( Session current_session) {
+		// set the color of logButton
+		if(current_session==null) // no session
+			logButton.setBackground( Color.PINK );
+		else // when enable log, set the background color of button to green; Otherwise, pink.
+			logButton.setBackground( current_session.isLogging() ? Color.GREEN : Color.PINK );
+	}
+	
 	public void updateTab()
 	{
 		// 為了下面 invokeLater 的關係，這邊改成 final
 		final Session s = (Session)tabbedPane.getSelectedComponent();
+
+		// update the color of LogButton according to its log mode
+		updateLogButton(s);
 		
 		if( s != null )
 		{	
 			// 修改視窗標題列
-			Site site = s.getSite();
+			/*Site site = s.getSite();
 			StringBuffer title = new StringBuffer( "ZTerm - " + s.getWindowTitle() + " " );
 			title.append( "[" + site.protocol + "]" );
 
 			// 只有 telnet 使用 SOCKS，且全域及站台設定皆要開啟
 			if( site.protocol.equalsIgnoreCase( Protocol.TELNET ) && resource.getBooleanValue( Resource.USING_SOCKS ) && site.usesocks )
 				title.append( "[SOCKS]" );
-			//setTitle( title.toString() );
+			setTitle( title.toString() );*/
 			
 			// 修改位置列
 			siteText.setText( s.getURL() );
@@ -881,6 +901,20 @@ public class ZTerm extends JPanel implements ActionListener, ChangeListener, Key
 		showMessage( Messages.getString("ZTerm.Message_About") ); //$NON-NLS-1$
 	}*/
 	
+	private String openSaveDialog(){
+		// set the default file name with current date and time
+		fileChooser.setSelectedFile(new File("amit_"
+			+ new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime())
+			+ ".log")
+		);
+		if( fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) { // when user presses save
+			File file = fileChooser.getSelectedFile();
+			//System.out.println(file.getPath());
+			return file.getPath();
+		}
+		return null; // when user presses cancel
+	}
+	
 	public void actionPerformed( ActionEvent ae )
 	{	
 		Object source = ae.getSource();
@@ -903,8 +937,20 @@ public class ZTerm extends JPanel implements ActionListener, ChangeListener, Key
 			paste();
 		} else if( source == colorPasteItem || source == colorPasteButton || source == popupColorPasteItem ) {
 			colorPaste();*/
-		if( source == openButton ) {
-			openNewTab();
+		if( source == logButton ) {
+			Session currentSession = (Session)tabbedPane.getSelectedComponent();
+			if(currentSession==null) return; // no session exists
+			
+			if(currentSession.isLogging()==false) { // not logging now
+				String filePath = openSaveDialog();
+				if(filePath==null || filePath.isEmpty()) return; // no valid path
+				
+				currentSession.startLogging(filePath); // start logging
+			}
+			else { // logging now
+				currentSession.closeLogging(); // close logging
+			}
+			updateLogButton( currentSession ); // update the color of logButton
 		} else if( source == closeButton ) {
 			closeCurrentTab();
 		} else if( source == reopenButton ) {
@@ -1146,6 +1192,9 @@ public class ZTerm extends JPanel implements ActionListener, ChangeListener, Key
 		// 各個連線
 		sessions = new Vector();
 		
+		// Initialize the file chooser dialog for saving log file
+		fileChooser = new JFileChooser();
+		
 		// 各種設定
 		resource = new Resource();
 
@@ -1222,5 +1271,11 @@ public class ZTerm extends JPanel implements ActionListener, ChangeListener, Key
 		ZTerm zterm = new ZTerm();
 		zterm.setSize(1024, 768);
 		frame.add(zterm);
+		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		frame.addWindowListener( new WindowAdapter() {
+			public void windowClosing(WindowEvent e) {
+				zterm.quit();
+			}
+		});
 	}
 }

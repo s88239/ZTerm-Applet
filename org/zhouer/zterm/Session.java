@@ -10,9 +10,12 @@ import java.awt.event.AdjustmentListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.util.Date;
 
 import javax.swing.JPanel;
@@ -45,6 +48,11 @@ public class Session extends JPanel implements Runnable, Application, Adjustment
 	
 	private String iconname;
 	private String windowtitle;
+	
+	// Use for loggin
+	private boolean logMode;
+	private String logFilePath;
+	private PrintWriter logFileStream;
 	
 	// 捲頁緩衝區的行數
 	private int scrolllines;
@@ -328,6 +336,9 @@ public class Session extends JPanel implements Runnable, Application, Adjustment
 			vt.close();
 		}
 		
+		// close log mode
+		closeLogging();
+		
 		// 將連線狀態改為斷線
 		setState( STATE_CLOSED );
 		
@@ -389,6 +400,54 @@ public class Session extends JPanel implements Runnable, Application, Adjustment
 	public void openExternalBrowser( String url )
 	{
 		parent.openExternalBrowser( url );
+	}
+
+	/*
+	 * Logging the session
+	 */
+	public boolean isLogging() {
+		return logMode;
+	}
+	
+	public String getLogFilePath() {
+		return logMode ? logFilePath : "";
+	}
+	
+	public void startLogging(String filePath) {
+		logMode = true;
+		logFilePath = filePath;
+		try {
+			logFileStream = new PrintWriter(
+					new OutputStreamWriter(
+							new FileOutputStream(filePath),
+							site.encoding
+							)
+					);
+		} catch(Exception e) {
+			logMode = false;
+			logFileStream = null;
+		}
+	}
+	
+	public void closeLogging() {
+		logMode = false;
+		if(logFileStream!=null) {
+			logFileStream.close();
+			logFileStream = null;
+		}
+		parent.updateLogButton(this);
+	}
+	
+	public void writeLog(char c) {
+		if(logFileStream!=null) {
+			if(c=='\n') {
+				logFileStream.flush();
+				logFileStream.println();
+			}
+			else {
+				logFileStream.print(c);
+			}
+		}
 	}
 	
 	class AntiIdleTask implements ActionListener
@@ -497,6 +556,10 @@ public class Session extends JPanel implements Runnable, Application, Adjustment
 		resource = r;
 		conv = c;
 		parent = pa;
+		
+		// Default: no logging
+		logMode = false;
+		logFileStream = null;
 		
 		// 設定擁有一個分頁
 		hasTab = true;
