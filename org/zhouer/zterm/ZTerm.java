@@ -196,6 +196,7 @@ public class ZTerm extends JPanel implements ActionListener, ChangeListener, Key
 		siteField = new JComboBox( siteModel );
 		siteField.setToolTipText(Messages.getString("ZTerm.Site_ComboBox_ToolTip")); //$NON-NLS-1$
 		siteField.setEditable( true );
+		siteField.addActionListener(this);
 		
 		siteText = (JTextComponent)siteField.getEditor().getEditorComponent();
 		siteText.addKeyListener( this );
@@ -394,7 +395,7 @@ public class ZTerm extends JPanel implements ActionListener, ChangeListener, Key
 		}
 	}
 	
-	public void updateCombo()
+	/*public void updateCombo()
 	{
 		int dotPos = siteText.getCaretPosition();
 		String text = siteText.getText();
@@ -417,7 +418,7 @@ public class ZTerm extends JPanel implements ActionListener, ChangeListener, Key
 		} else {
 			siteField.hidePopup();
 		}
-	}
+	}*/
 	
 	public void updateEncoding( String enc )
 	{
@@ -797,7 +798,7 @@ public class ZTerm extends JPanel implements ActionListener, ChangeListener, Key
 	public void openNewTab()
 	{
 		String host = siteText.getText();
-		siteModel.removeAllElements();
+		//siteModel.removeAllElements();
 		connect( host );
 	}
 	
@@ -959,6 +960,17 @@ public class ZTerm extends JPanel implements ActionListener, ChangeListener, Key
 			updateEncoding( "Big5" );
 		} else if( source == utf8Item ) {
 			updateEncoding( "UTF-8" );
+		} else if( source == siteField ) {
+			if (ae.getActionCommand().equals("comboBoxChanged")) {
+				String host = siteText.getText();
+				int left_parenthesis_idx;
+				// select default connection passed from UI
+				if(host.indexOf(')')!=-1 && (left_parenthesis_idx = host.indexOf('('))!=-1){
+					host = host.substring(0, left_parenthesis_idx).trim();
+					//JOptionPane.showMessageDialog(null, host+'@');
+					connect(host); // start connect
+				}
+			}
 		}
 		
 		// 我的最愛列表
@@ -1100,7 +1112,7 @@ public class ZTerm extends JPanel implements ActionListener, ChangeListener, Key
 			
 			if( e.getKeyChar() == KeyEvent.VK_ENTER ) {
 				openNewTab();
-			} else if( e.getKeyChar() == KeyEvent.VK_ESCAPE ) {
+			}/* else if( e.getKeyChar() == KeyEvent.VK_ESCAPE ) {
 				// ignore escape
 			} else {
 				javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -1108,7 +1120,7 @@ public class ZTerm extends JPanel implements ActionListener, ChangeListener, Key
 						updateCombo();
 					}
 				});
-			}
+			}*/
 		}
 	}
 	
@@ -1192,6 +1204,15 @@ public class ZTerm extends JPanel implements ActionListener, ChangeListener, Key
 		
 		// 自動連線
 		autoconnect();
+	}
+	
+	public ZTerm(ConnectionInfo[] connection_info_list){
+		this();
+		// add all IPs to combo box
+		for(int i=0; i < connection_info_list.length; ++i){
+			siteModel.addElement(connection_info_list[i].getUrl()
+					+ "  (" + connection_info_list[i].getDeviceName() + ")");
+		}
 	}
 	
 	public static void main( String args[] ) {
