@@ -475,7 +475,7 @@ public class Session extends JPanel implements Runnable, Application, Adjustment
 		
 		// 連線成功，更新或新增連線紀錄
 		resource.addFavorite( site );
-		parent.updateFavoriteMenu();
+		//parent.updateFavoriteMenu();
 		
 		// 防閒置用的 Timer
 		updateAntiIdleTime();
