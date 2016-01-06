@@ -942,6 +942,8 @@ public class ZTerm extends JPanel implements ActionListener, ChangeListener, Key
 			if(currentSession==null) return; // no session exists
 			
 			if(currentSession.isLogging()==false) { // not logging now
+				if(currentSession.isClosed()) return; // don't log when connection is close
+				
 				String filePath = openSaveDialog();
 				if(filePath==null || filePath.isEmpty()) return; // no valid path
 				

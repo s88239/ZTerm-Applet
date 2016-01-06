@@ -133,7 +133,7 @@ public class VT100 extends JComponent
 	private int scol, srow;
 	
 	// the last line write to log file
-	private int logLastLine;
+	private int logLastCol;
 	
 	// 儲存螢幕上的相關資訊
 	private char[][] text;			// 轉碼後的 char
@@ -1914,6 +1914,7 @@ public class VT100 extends JComponent
 			}
 			break;
 		case 10: // LF (Line Feed)
+			writeLogLine(); // write the whole line to log file
 			crow++;
 			// 到 buttommargin 就該捲頁
 			if( crow > buttommargin ) {
@@ -1924,7 +1925,9 @@ public class VT100 extends JComponent
 		// case 11:
 		// case 12:
 		case 13: // CR (Carriage Return)
-			writeLogLine();
+			if(ccol > logLastCol)
+				logLastCol = ccol; // store the max number of chars in the line
+			
 			ccol = leftmargin;
 			break;
 		case 14: // SO (Shift Out)
@@ -2082,17 +2085,19 @@ public class VT100 extends JComponent
 		Session currentSession = (Session)parent;
 		if(!currentSession.isLogging()) return; // not at log mode
 		
-		int prow = physicalRow( crow );
-		if (prow==logLastLine) return; // prevent double carriage return at same line 
+		int prow = physicalRow( crow ); // get the index of physical row
+		// use logLastCol if encounter \r before \n in the same line
+		// otherwise, use ccol because logLastCol = 0 when encounter only \n
+		int lastCol = (ccol > logLastCol) ? ccol : logLastCol;
 		
-		logLastLine = prow;
-		for(int i=0; i<ccol-1; ++i){
+		for(int i=0; i<lastCol-1; ++i){
 			//System.out.print(text[prow][i]);
-			currentSession.writeLog(text[prow][i]);
+			currentSession.writeLog(text[prow][i]); // write the char to the log file
 			if (Convertor.isWideChar( text[prow][i] )) // encounter wide char
 				++i; // skip next char because it's a redundant space
 		}
-		currentSession.writeLog('\n');
+		currentSession.writeLog('\n'); // finished writing chars of whole line, append new line
+		logLastCol = 0; // reset
 	}
 	
 	private void draw()
@@ -2305,7 +2310,7 @@ public class VT100 extends JComponent
 		conv = cv;
 		bi = b;
 		
-		logLastLine = -1;
+		logLastCol = 0;
 		
 		// 初始化一些變數、陣列
 		initValue();
