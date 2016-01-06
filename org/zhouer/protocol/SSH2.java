@@ -14,6 +14,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
 
 import ch.ethz.ssh2.InteractiveCallback;
+import org.zhouer.zterm.Messages;
 
 class SSH2InputStream extends InputStream
 {
@@ -104,7 +105,7 @@ class Auth implements InteractiveCallback {
 	
 	public static String getUsername()
 	{
-		return JOptionPane.showInputDialog( null, "使用者名稱：", "使用者名稱", JOptionPane.QUESTION_MESSAGE);
+		return JOptionPane.showInputDialog( null, Messages.getString("SSH2.Username") + "：", Messages.getString("SSH2.Username"), JOptionPane.QUESTION_MESSAGE);
 	}
 
 	public static String getPasword( String title, String prompt )
@@ -176,7 +177,7 @@ public class SSH2 implements Protocol
 				// 	System.out.println( methods[i] );
 				// }
 				if( conn.isAuthMethodAvailable( username, "password" ) ) {
-					authenticated = conn.authenticateWithPassword( username, Auth.getPasword( "輸入密碼", "請輸入密碼：" ) );
+					authenticated = conn.authenticateWithPassword( username, Auth.getPasword( Messages.getString("SSH2.Password"), Messages.getString("SSH2.Password") + "：" ) );
 					// System.out.println("SSH2: password auth");
 				} else if( conn.isAuthMethodAvailable( username, "keyboard-interactive" )) {
 					authenticated = conn.authenticateWithKeyboardInteractive( username, new Auth() );

@@ -461,7 +461,7 @@ public class Session extends JPanel implements Runnable, Application, Adjustment
 		if( network.connect() == false ) {
 			//  設定連線狀態為 closed
 			setState( STATE_CLOSED );
-			showMessage( "連線失敗！" );
+			showMessage( Messages.getString("Session.FailConnect") + "！" );
 			return;
 		}
 		
