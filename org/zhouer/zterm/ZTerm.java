@@ -50,21 +50,14 @@ public class ZTerm extends JPanel implements ActionListener, ChangeListener, Key
 	private static final long serialVersionUID = 6304594468121008572L;
 		
 	// 標準選單
-	//private JMenuBar menuBar;
-	//private JMenu connectMenu, siteMenu, editMenu, optionMenu, helpMenu;
-	private JMenu encodingMenu;
-	//private JMenuItem openItem, closeItem, reopenItem, quitItem;
-	//private JMenuItem copyItem, pasteItem, colorCopyItem, colorPasteItem;
-	//private JMenuItem preferenceItem, siteManagerItem, showToolbarItem;
-	//private JMenuItem usageItem, faqItem, aboutItem;
-	private JMenuItem big5Item, utf8Item;
 	//private JMenuItem[] favoriteItems;
 	
 	// popup 選單
 	private JPopupMenu popupMenu;
-	private JMenu quickLinkMenu;
+	private JMenu encodingMenu;
 	private JMenuItem popupCopyItem, popupPasteItem, popupColorCopyItem, popupColorPasteItem, popupCopyLinkItem;
-	private JMenuItem googleSearchItem, tinyurlItem, orzItem, badongoItem;
+	private JMenuItem googleSearchItem;
+	private JMenuItem big5Item, utf8Item;
 	
 	// 連線工具列
 	private JToolBar connectionToolbar;
@@ -104,118 +97,6 @@ public class ZTerm extends JPanel implements ActionListener, ChangeListener, Key
 	// 建立各種選單，包括 popup 選單也在這裡建立
 	private void makeMenu()
 	{
-		/*menuBar = new JMenuBar();
-		
-		connectMenu = new JMenu(Messages.getString("ZTerm.Connect_Menu_Text")); //$NON-NLS-1$
-		connectMenu.setMnemonic(KeyEvent.VK_N);
-		connectMenu.setToolTipText(Messages.getString("ZTerm.Connect_Menu_ToolTip")); //$NON-NLS-1$
-
-		siteMenu = new JMenu(Messages.getString("ZTerm.Site_Menu_Text")); //$NON-NLS-1$
-		siteMenu.setMnemonic(KeyEvent.VK_F);
-		siteMenu.setToolTipText(Messages.getString("ZTerm.Site_Menu_ToolTip")); //$NON-NLS-1$
-		
-		editMenu = new JMenu(Messages.getString("ZTerm.Edit_Menu_Text")); //$NON-NLS-1$
-		editMenu.setMnemonic(KeyEvent.VK_E);
-		editMenu.setToolTipText(Messages.getString("ZTerm.Edit_Menu_ToolTip")); //$NON-NLS-1$
-		
-		optionMenu = new JMenu(Messages.getString("ZTerm.Option_Menu_Text")); //$NON-NLS-1$
-		optionMenu.setMnemonic(KeyEvent.VK_O);
-		optionMenu.setToolTipText(Messages.getString("ZTerm.Option_Menu_ToolTip")); //$NON-NLS-1$
-		
-		helpMenu = new JMenu(Messages.getString("ZTerm.Help_Menu_Text")); //$NON-NLS-1$
-		helpMenu.setMnemonic(KeyEvent.VK_H);		
-		helpMenu.setToolTipText(Messages.getString("ZTerm.Help_Menu_ToolTip")); //$NON-NLS-1$*/
-		
-		encodingMenu = new JMenu(Messages.getString("ZTerm.Encoding_Menu_Text")); //$NON-NLS-1$
-		
-		/*openItem = new JMenuItem(Messages.getString("ZTerm.Open_MenuItem_Text")); //$NON-NLS-1$
-		openItem.setToolTipText(Messages.getString("ZTerm.Open_MenuItem_ToolTip")); //$NON-NLS-1$
-		openItem.addActionListener( this );
-		
-		closeItem = new JMenuItem(Messages.getString("ZTerm.Close_MenuItem_Text")); //$NON-NLS-1$
-		closeItem.setToolTipText(Messages.getString("ZTerm.Close_MenuItem_ToolTip")); //$NON-NLS-1$
-		closeItem.addActionListener( this );
-
-		reopenItem = new JMenuItem(Messages.getString("ZTerm.Reopen_Item_Text")); //$NON-NLS-1$
-		reopenItem.setToolTipText(Messages.getString("ZTerm.Reopen_Item_ToolTip")); //$NON-NLS-1$
-		reopenItem.addActionListener( this );
-		
-		quitItem = new JMenuItem(Messages.getString("ZTerm.Quit_Item_Text")); //$NON-NLS-1$
-		quitItem.addActionListener( this );
-
-		copyItem = new JMenuItem(Messages.getString("ZTerm.Copy_MenuItem_Text")); //$NON-NLS-1$
-		copyItem.addActionListener( this );
-		copyItem.setToolTipText(Messages.getString("ZTerm.Copy_MenuItem_ToolTip")); //$NON-NLS-1$
-		
-		pasteItem = new JMenuItem(Messages.getString("ZTerm.Paste_MenuItem_Text")); //$NON-NLS-1$
-		pasteItem.addActionListener( this );
-		pasteItem.setToolTipText(Messages.getString("ZTerm.Paste_MenuItem_ToolTip")); //$NON-NLS-1$
-
-		colorCopyItem = new JMenuItem(Messages.getString("ZTerm.ColorCopy_MenuItem_Text")); //$NON-NLS-1$
-		colorCopyItem.addActionListener( this );
-		
-		colorPasteItem = new JMenuItem(Messages.getString("ZTerm.ColorPaste_MenuItem_Text")); //$NON-NLS-1$
-		colorPasteItem.addActionListener( this );
-		
-		preferenceItem = new JMenuItem(Messages.getString("ZTerm.Preference_MenuItem_Text")); //$NON-NLS-1$
-		preferenceItem.addActionListener( this );
-		preferenceItem.setToolTipText(Messages.getString("ZTerm.Preference_MenuItem_ToolTip")); //$NON-NLS-1$
-		
-		siteManagerItem = new JMenuItem(Messages.getString("ZTerm.SiteManager_MenuItem_Text")); //$NON-NLS-1$
-		siteManagerItem.addActionListener( this );
-		siteManagerItem.setToolTipText(Messages.getString("ZTerm.SiteManager_MenuItem_ToolTip")); //$NON-NLS-1$
-		
-		showToolbarItem = new JMenuItem( showToolbar ? Messages.getString("ZTerm.ToggleToolbar_MenuItem_Show_Text") : Messages.getString("ZTerm.ToggleToolbar_MenuItem_Hide_Text")); //$NON-NLS-1$ //$NON-NLS-2$
-		showToolbarItem.addActionListener( this );
-		
-		usageItem = new JMenuItem(Messages.getString("ZTerm.Usage_MenuItem_Text")); //$NON-NLS-1$
-		usageItem.addActionListener( this );
-		
-		faqItem = new JMenuItem(Messages.getString("ZTerm.FAQ_MenuItem_Text")); //$NON-NLS-1$
-		faqItem.addActionListener( this );
-		
-		aboutItem = new JMenuItem(Messages.getString("ZTerm.About_MenuItem_Text")); //$NON-NLS-1$
-		aboutItem.addActionListener( this );*/
-		
-		big5Item = new JMenuItem(Messages.getString("ZTerm.Big5_MenuItem_Text")); //$NON-NLS-1$
-		big5Item.addActionListener( this );
-		
-		utf8Item = new JMenuItem(Messages.getString("ZTerm.UTF8_MenuItem_Text")); //$NON-NLS-1$
-		utf8Item.addActionListener( this );
-		
-		/*menuBar.add( connectMenu );
-		menuBar.add( siteMenu );
-		menuBar.add( editMenu );
-		menuBar.add( optionMenu );
-		menuBar.add( helpMenu );
-		
-		connectMenu.add( openItem );
-		connectMenu.add( closeItem );
-		connectMenu.add( reopenItem );
-		connectMenu.add( quitItem );
-		
-		updateFavoriteMenu();*/
-		
-		encodingMenu.add( big5Item );
-		encodingMenu.add( utf8Item );
-		
-		/*editMenu.add( copyItem );
-		editMenu.add( pasteItem );
-		editMenu.add( colorCopyItem );
-		editMenu.add( colorPasteItem );
-		editMenu.addSeparator();
-		editMenu.add( encodingMenu );
-		
-		optionMenu.add( preferenceItem );
-		optionMenu.add( siteManagerItem );
-		optionMenu.add( showToolbarItem );
-		
-		helpMenu.add( usageItem );
-		helpMenu.add( faqItem );
-		helpMenu.add( aboutItem );
-		
-		setJMenuBar( menuBar);*/
-		
 		// popup menu
 		popupMenu = new JPopupMenu();
 		
@@ -236,21 +117,17 @@ public class ZTerm extends JPanel implements ActionListener, ChangeListener, Key
 		
 		googleSearchItem = new JMenuItem( Messages.getString("ZTerm.Popup_GoogleSearch_MenuItem_Text") );
 		googleSearchItem.addActionListener( this );
-
-		quickLinkMenu = new JMenu( Messages.getString("ZTerm.Popup_QuickLink_Menu_Text") );
 		
-		tinyurlItem = new JMenuItem( Messages.getString("ZTerm.Popup_Tinyurl_MenuItem_Text") );
-		tinyurlItem.addActionListener( this );
-
-		orzItem = new JMenuItem( Messages.getString("ZTerm.Popup_Orz_MenuItem_Text") );
-		orzItem.addActionListener( this );
-
-		badongoItem = new JMenuItem( Messages.getString("ZTerm.Popup_Badongo_MenuItem_Text") );
-		badongoItem.addActionListener( this );
-
-		quickLinkMenu.add( tinyurlItem );
-		quickLinkMenu.add( orzItem );
-		quickLinkMenu.add( badongoItem );
+		encodingMenu = new JMenu(Messages.getString("ZTerm.Popup_Encoding_Menu_Text"));
+		
+		big5Item = new JMenuItem("Big5");
+		big5Item.addActionListener( this );
+		
+		utf8Item = new JMenuItem("UTF-8");
+		utf8Item.addActionListener( this );
+		
+		encodingMenu.add( big5Item );
+		encodingMenu.add( utf8Item );
 		
 		popupMenu.add( popupCopyItem );
 		popupMenu.add( popupPasteItem );
@@ -259,7 +136,8 @@ public class ZTerm extends JPanel implements ActionListener, ChangeListener, Key
 		popupMenu.addSeparator();
 		popupMenu.add( popupCopyLinkItem );
 		popupMenu.add( googleSearchItem );
-		popupMenu.add( quickLinkMenu );
+		popupMenu.addSeparator();
+		popupMenu.add( encodingMenu );
 	}
 	
 	private void makeTabbedPane()
@@ -639,9 +517,6 @@ public class ZTerm extends JPanel implements ActionListener, ChangeListener, Key
 		popupColorPasteItem.setEnabled( hasColorText );
 		
 		googleSearchItem.setEnabled( hasSelectedText );
-		tinyurlItem.setEnabled( hasSelectedText );
-		orzItem.setEnabled( hasSelectedText );
-		badongoItem.setEnabled( hasSelectedText );
 		
 		// 傳進來的是滑鼠相對於視窗左上角的座標，減去主視窗相對於螢幕左上角的座標，可得滑鼠相對於主視窗的座標。
 		popupMenu.show( this, x - p.x , y - p.y );
@@ -1047,7 +922,7 @@ public class ZTerm extends JPanel implements ActionListener, ChangeListener, Key
 			String str = getSelectedText();
 			resetSelected();
 			openExternalBrowser("http://www.google.com.tw/search?q=" + str);
-		} else if( source == tinyurlItem ) {
+		/*} else if( source == tinyurlItem ) {
 			String str = getSelectedText();
 			resetSelected();
 			openExternalBrowser("http://tinyurl.com/" + str);
@@ -1059,7 +934,7 @@ public class ZTerm extends JPanel implements ActionListener, ChangeListener, Key
 			String str = getSelectedText();
 			resetSelected();
 			openExternalBrowser("http://www.badongo.com/file/" + str);
-		/*} else if( source == telnetButton ) {
+		} else if( source == telnetButton ) {
 			siteText.setText( "telnet://" );
 			siteField.requestFocusInWindow();
 		} else if( source == sshButton ) {
