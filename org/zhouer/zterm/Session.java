@@ -414,16 +414,15 @@ public class Session extends JPanel implements Runnable, Application, Adjustment
 	}
 	
 	public void startLogging(String filePath) {
+		// record the condition of log
 		logMode = true;
 		logFilePath = filePath;
-		try {
+		try { // open a new file for logging
 			logFileStream = new PrintWriter(
-					new OutputStreamWriter(
-							new FileOutputStream(filePath),
-							site.encoding
-							)
-					);
-		} catch(Exception e) {
+				new OutputStreamWriter(new FileOutputStream(filePath),	site.encoding )
+			);
+		} catch(Exception e) { // encounter error when create file stream
+			// reset variables of log
 			logMode = false;
 			logFileStream = null;
 		}
@@ -432,19 +431,20 @@ public class Session extends JPanel implements Runnable, Application, Adjustment
 	public void closeLogging() {
 		logMode = false;
 		if(logFileStream!=null) {
-			logFileStream.close();
+			logFileStream.close(); // close the file stream
+			// reset variables of log
 			logFileStream = null;
 		}
-		parent.updateLogButton(this);
+		parent.updateLogButton(this); // update the color of logButton from green to pink
 	}
 	
 	public void writeLog(char c) {
 		if(logFileStream!=null) {
-			if(c=='\n') {
+			if(c=='\n') { // finished writing whole line to log file
 				logFileStream.flush();
 				logFileStream.println();
 			}
-			else {
+			else { // write the char into file
 				logFileStream.print(c);
 			}
 		}

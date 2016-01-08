@@ -321,16 +321,16 @@ public class Resource implements Config
 		// 載入預設值
 		loadDefault();
 		
-		// 從設定檔讀取設定，若不存在則新建設定檔
+		// 從設定檔讀取設定
 		if( rc.exists() ) {
 			readFile();
-		} else {
-			try {
+		} else { // if not exist, do nothing because we won't write config in applet
+			/*try {
 				rc.createNewFile();
 				// System.out.println("rcfile: " + rc.getName() + " created.");
 			} catch (IOException e) {
 				System.out.println("catch IOException when create new rcfile.");
-			}
+			}*/
 		}
 	}
 }

@@ -6,18 +6,27 @@ import javax.swing.SwingUtilities;
 public class ConnectionApplet extends JApplet {
 	private static final long serialVersionUID = 1875716719880652455L;
 	
+	private ZTerm zterm;
 	private ConnectionInfo[] connection_info_list;
+	private String[] device_name_list;
+	private String[] protocol_list;
+	private String[] ip_list;
+	private String[] port_list;
 	
 	public void init() {
+		getParam();
+		
         //Execute a job on the event-dispatching thread; creating this applet's GUI.
         try {
             SwingUtilities.invokeAndWait(new Runnable() {
                 public void run() {
                 	parseParam();
-                    add(new ZTerm(connection_info_list)); // Create ZTerm with passed parameters
+                	zterm = new ZTerm(connection_info_list);
+                    add(zterm); // Create ZTerm with passed parameters
                 }
             });
         } catch (Exception e) {
+        	zterm = null;
             System.err.println("createGUI didn't complete successfully");
         }
     }
@@ -31,18 +40,25 @@ public class ConnectionApplet extends JApplet {
 	 *  <PARAM name="port" value="22,4001,23">
 	 * </applet>
 	 */
-    private void parseParam(){
-    	/*String[] device_name_list = "Howdy,IOG,CISCO".split(",");
-    	String[] protocol_list = "ssh,telnet,telnet".split(",");
-    	String[] ip_list = "192.168.121.39,192.168.123.254,192.168.123.208".split(",");
-    	String[] port_list = "22,4001,23".split(",");*/
-    	
-    	// get all information passed from UI
-    	String[] device_name_list = getParameter("device_name").split(",");
-    	String[] protocol_list = getParameter("protocol").split(",");
-    	String[] ip_list = getParameter("ip").split(",");
-    	String[] port_list = getParameter("port").split(",");
-    	
+	private void getParam() {
+    	try { // get from UI
+    		device_name_list = getParameter("device_name").split(",");
+        	protocol_list = getParameter("protocol").split(",");
+        	ip_list = getParameter("ip").split(",");
+        	port_list = getParameter("port").split(",");
+    	} catch (Exception e) { // test in eclipse
+    		device_name_list = "Howdy,IOG,CISCO".split(",");
+        	protocol_list = "ssh,telnet,telnet".split(",");
+        	ip_list = "192.168.121.39,192.168.123.254,192.168.123.208".split(",");
+        	port_list = "22,4001,23".split(",");
+    	}
+	}
+	
+	/*
+	 * Split the string by comma.
+	 * Each item with the same index is combined to connectionInfo.
+	 */
+    private void parseParam(){    	
     	connection_info_list = new ConnectionInfo[ip_list.length];
     	String device_name, protocol, port;
     	
@@ -58,4 +74,14 @@ public class ConnectionApplet extends JApplet {
     		connection_info_list[i] = new ConnectionInfo(device_name, protocol, ip_list[i], port);
     	}
     }
+    
+    /*
+     * @see java.applet.Applet#destroy()
+     * destroy method is called only when the browser is closed
+     */
+    public void destroy() {
+    	if(zterm != null)
+    		zterm.quit();
+    }
+
 }

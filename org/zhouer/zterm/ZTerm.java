@@ -21,8 +21,8 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.Iterator;
+//import java.util.Collections;
+//import java.util.Iterator;
 import java.util.Vector;
 
 import javax.swing.DefaultComboBoxModel;
@@ -32,7 +32,6 @@ import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
-import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -260,7 +259,7 @@ public class ZTerm extends JPanel implements ActionListener, ChangeListener, Key
 		}
 	}*/
 	
-	public void updateToolbar()
+	/*public void updateToolbar()
 	{
 		synchronized( menulock ) {
 			showToolbar = resource.getBooleanValue( Resource.SHOW_TOOLBAR );
@@ -268,7 +267,7 @@ public class ZTerm extends JPanel implements ActionListener, ChangeListener, Key
 			connectionToolbar.setVisible( showToolbar );
 			validate();
 		}
-	}
+	}*/
 	
 	public void updateBounds()
 	{
@@ -459,7 +458,7 @@ public class ZTerm extends JPanel implements ActionListener, ChangeListener, Key
 		getFontMetrics( font );
 	}
 	
-	private Vector getCandidateSites( String term )
+	/*private Vector getCandidateSites( String term )
 	{
 		Vector candi = new Vector();
 
@@ -483,7 +482,7 @@ public class ZTerm extends JPanel implements ActionListener, ChangeListener, Key
 		Collections.sort( candi );
 		
 		return candi;
-	}
+	}*/
 	
 	public void changeSession( int index )
 	{
@@ -543,7 +542,7 @@ public class ZTerm extends JPanel implements ActionListener, ChangeListener, Key
 		popupMenu.show( this, x - p.x , y - p.y );
 	}
 	
-	private void autoconnect()
+	/*private void autoconnect()
 	{
 		Vector f = resource.getFavorites();
 		Iterator iter = f.iterator();
@@ -555,7 +554,7 @@ public class ZTerm extends JPanel implements ActionListener, ChangeListener, Key
 				connect( s, -1 );
 			}
 		}
-	}
+	}*/
 	
 	private void connect( String h )
 	{
@@ -706,7 +705,7 @@ public class ZTerm extends JPanel implements ActionListener, ChangeListener, Key
 	
 	public void quit()
 	{
-		for( int i = 0; i < sessions.size(); i++) {
+		/*for( int i = 0; i < sessions.size(); i++) {
 			if( !((Session)sessions.elementAt(i)).isClosed() ) {
 				if( showConfirm( Messages.getString("ZTerm.Message_Confirm_Exit"), Messages.getString("ZTerm.Title_Confirm_Exit"), JOptionPane.YES_NO_OPTION ) != JOptionPane.YES_OPTION ) { //$NON-NLS-1$ //$NON-NLS-2$
 					return;
@@ -714,7 +713,7 @@ public class ZTerm extends JPanel implements ActionListener, ChangeListener, Key
 					break;
 				}
 			}
-		}
+		}*/
 
 		for( int i = 0; i < sessions.size(); i++) {
 			((Session)sessions.elementAt(i)).close( false );
@@ -722,14 +721,14 @@ public class ZTerm extends JPanel implements ActionListener, ChangeListener, Key
 		sessions.removeAllElements();
 
 		// 紀錄結束時的視窗大小
-		Rectangle r = getBounds();
+		/*Rectangle r = getBounds();
 		resource.setValue( Resource.GEOMETRY_X, r.x );
 		resource.setValue( Resource.GEOMETRY_Y, r.y );
 		resource.setValue( Resource.GEOMETRY_WIDTH, r.width );
 		resource.setValue( Resource.GEOMETRY_HEIGHT, r.height );
 		
 		// 程式結束，把目前設定值寫回設定檔。
-		resource.writeFile();
+		resource.writeFile();*/
 		
 		System.exit( 0 );
 	}
@@ -1215,8 +1214,8 @@ public class ZTerm extends JPanel implements ActionListener, ChangeListener, Key
 		closedIcon = new ImageIcon( ZTerm.class.getResource( "icon/closed.png" ) );
 		bellIcon = new ImageIcon( ZTerm.class.getResource( "icon/bell.png" ) );
 		
-		// 是否要顯示工具列
-		showToolbar = resource.getBooleanValue( Resource.SHOW_TOOLBAR );
+		// show the tool bar
+		showToolbar = true;//resource.getBooleanValue( Resource.SHOW_TOOLBAR );
 		
 		// 設定主畫面 Layout
 		this.setLayout( new BorderLayout() );
@@ -1254,7 +1253,7 @@ public class ZTerm extends JPanel implements ActionListener, ChangeListener, Key
 		cacheFont();
 		
 		// 自動連線
-		autoconnect();
+		//autoconnect();
 	}
 	
 	public ZTerm(ConnectionInfo[] connection_info_list){
